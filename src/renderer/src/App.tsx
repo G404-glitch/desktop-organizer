@@ -1,4 +1,4 @@
-import Desktop from './components/Desktop'
+import { Desktop } from './components/desktop/Desktop'
 
 function App(): React.JSX.Element {
   return <Desktop />

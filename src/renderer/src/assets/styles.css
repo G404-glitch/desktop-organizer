@@ -1,0 +1,294 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.875rem;
+  /* Transparent overlay: the OS desktop shows through. */
+  --background: oklch(0 0 0 / 0);
+  --foreground: oklch(0.97 0.01 250);
+  --card: oklch(0.24 0.03 265 / 0.55);
+  --card-foreground: oklch(0.97 0.01 250);
+  --popover: oklch(0.2 0.03 265 / 0.9);
+  --popover-foreground: oklch(0.97 0.01 250);
+  --primary: oklch(0.72 0.15 200);
+  --primary-foreground: oklch(0.18 0.03 265);
+  --secondary: oklch(0.3 0.03 265 / 0.6);
+  --secondary-foreground: oklch(0.97 0.01 250);
+  --muted: oklch(0.3 0.03 265 / 0.5);
+  --muted-foreground: oklch(0.75 0.02 255);
+  --accent: oklch(0.78 0.15 195);
+  --accent-foreground: oklch(0.18 0.03 265);
+  --note-accent: oklch(0.85 0.15 90);
+  --note-surface: oklch(0.85 0.14 92 / 0.12);
+  --destructive: oklch(0.68 0.2 20);
+  --destructive-foreground: oklch(0.98 0.01 250);
+  --border: oklch(1 0 0 / 0.14);
+  --input: oklch(1 0 0 / 0.16);
+  --ring: oklch(0.78 0.15 195 / 0.6);
+  --strip: oklch(0.18 0.03 265 / 0.72);
+  --glass: oklch(0.22 0.03 265 / 0.55);
+  --glass-hi: oklch(1 0 0 / 0.08);
+  --shadow-panel: 0 18px 40px -18px oklch(0 0 0 / 0.7);
+  --shadow-glow: 0 0 0 1px oklch(0.78 0.15 195 / 0.35), 0 20px 45px -18px oklch(0 0 0 / 0.75);
+  --sidebar: var(--glass);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+  --chart-1: oklch(0.78 0.15 195);
+  --chart-2: oklch(0.72 0.16 150);
+  --chart-3: oklch(0.8 0.14 90);
+  --chart-4: oklch(0.68 0.17 300);
+  --chart-5: oklch(0.7 0.18 20);
+}
+
+@theme inline {
+  --color-note-accent: var(--note-accent);
+  --color-note-surface: var(--note-surface);
+  --color-strip: var(--strip);
+  --color-glass: var(--glass);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body,
+  #root {
+    background: transparent;
+    color: var(--color-foreground);
+    font-family:
+      "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  .drag-strip {
+    -webkit-app-region: drag;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0 0.65rem;
+    height: 34px;
+    flex: none;
+    background: linear-gradient(
+      to right,
+      var(--strip),
+      color-mix(in oklab, var(--strip) 80%, transparent)
+    );
+    backdrop-filter: blur(20px) saturate(150%);
+    border-bottom: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 var(--glass-hi);
+  }
+
+  .no-drag,
+  .no-drag * {
+    -webkit-app-region: no-drag;
+  }
+
+  .drag-strip-dots {
+    width: 26px;
+    height: 10px;
+    border-radius: 999px;
+    background-image: radial-gradient(currentColor 1px, transparent 1.4px);
+    background-size: 5px 5px;
+    color: color-mix(in oklab, var(--accent) 70%, transparent);
+  }
+
+  .strip-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    height: 22px;
+    padding: 0 0.55rem;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-foreground);
+    background: color-mix(in oklab, var(--accent) 88%, transparent);
+    transition: filter 0.15s ease;
+  }
+  .strip-button:hover {
+    filter: brightness(1.1);
+  }
+
+  .win-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 22px;
+    border-radius: 6px;
+    color: color-mix(in oklab, var(--foreground) 75%, transparent);
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
+  }
+  .win-button:hover {
+    background: var(--glass-hi);
+    color: var(--foreground);
+  }
+  .win-close:hover {
+    background: color-mix(in oklab, var(--destructive) 75%, transparent);
+    color: var(--destructive-foreground);
+  }
+
+  .glass-panel {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--glass);
+    backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: var(--shadow-panel);
+    transition:
+      box-shadow 0.18s ease,
+      border-color 0.18s ease;
+  }
+  .glass-panel:hover {
+    border-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+  .glass-panel-active {
+    box-shadow: var(--shadow-glow);
+  }
+  .glass-panel-note {
+    background: linear-gradient(
+      160deg,
+      color-mix(in oklab, var(--note-accent) 14%, var(--glass)),
+      var(--glass)
+    );
+  }
+
+  .resize-grip {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    border-radius: 0 0 var(--radius) 0;
+    background-image: linear-gradient(
+      135deg,
+      transparent 55%,
+      color-mix(in oklab, var(--foreground) 45%, transparent) 55% 62%,
+      transparent 62% 72%,
+      color-mix(in oklab, var(--foreground) 45%, transparent) 72% 79%,
+      transparent 79%
+    );
+    opacity: 0.5;
+  }
+  .resize-grip:hover {
+    opacity: 1;
+  }
+
+  .app-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.2rem;
+    border-radius: 0.75rem;
+    transition: background 0.15s ease;
+  }
+  .app-tile:hover {
+    background: var(--glass-hi);
+  }
+  .app-tile-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 0.7rem;
+    border: 1px solid var(--border);
+    background: color-mix(in oklab, var(--accent) 12%, transparent);
+  }
+
+  .glass-menu {
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--popover);
+    backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: var(--shadow-panel);
+    padding: 0.25rem;
+  }
+
+  .menu-item {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.55rem;
+    border-radius: 0.5rem;
+    font-size: 12px;
+    color: var(--popover-foreground);
+  }
+  .menu-item:hover {
+    background: var(--glass-hi);
+  }
+}
+
