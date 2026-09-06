@@ -1,11 +1,10 @@
-import { BrowserWindow, ipcMain, shell } from 'electron'
-import Store from 'electron-store'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
+// Use require to handle CommonJS default export shape at runtime.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const _StorePkg = require('electron-store') as any
+const Store = _StorePkg.default ?? _StorePkg
 import { setWallpaper } from 'wallpaper'
 
-const getFileIcon = require('extract-file-icon') as (
-  filePath: string,
-  size?: number
-) => Buffer | string | undefined
 
 import {
   IPC_CHANNELS,
@@ -16,7 +15,7 @@ import {
   type SetWallpaperResult
 } from '../shared/ipc'
 
-const store = new Store<Record<string, unknown>>()
+const store = new Store() as any
 
 const fallbackIconDataUrl =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
@@ -54,22 +53,16 @@ export function registerIpcHandlers(win: BrowserWindow): void {
     IPC_CHANNELS.GET_FILE_ICON,
     async (_event, filePath: string): Promise<GetFileIconResult> => {
       try {
-        const icon = getFileIcon(filePath, 64) as Buffer | string | undefined
-
-        if (typeof icon === 'string') {
-          return {
-            dataUrl: icon.startsWith('data:') ? icon : fallbackIconDataUrl
-          }
-        }
-
-        if (Buffer.isBuffer(icon)) {
-          return {
-            dataUrl: `data:image/png;base64,${icon.toString('base64')}`
+        const nativeImg = await app.getFileIcon(filePath, { size: 'normal' })
+        if (nativeImg && typeof nativeImg.toDataURL === 'function') {
+          const dataUrl = nativeImg.toDataURL()
+          if (typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
+            return { dataUrl }
           }
         }
 
         return { dataUrl: fallbackIconDataUrl }
-      } catch {
+      } catch (err) {
         return { dataUrl: fallbackIconDataUrl }
       }
     }
