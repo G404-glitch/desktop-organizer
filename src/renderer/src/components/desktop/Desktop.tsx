@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Minus, Square, X } from "lucide-react";
 import { BoxGrid, type DesktopBox } from "./BoxGrid";
 import { AddBoxButton } from "./AddBoxButton";
@@ -23,6 +23,41 @@ export function Desktop({
 }: DesktopProps) {
   const [boxes, setBoxes] = useState<DesktopBox[]>(initialBoxes);
 
+  useEffect(() => {
+    let active = true;
+
+    void (async () => {
+      try {
+        const result = await window.api.loadLayout();
+        if (!active) return;
+
+        if (Array.isArray(result.data)) {
+          setBoxes(result.data as DesktopBox[]);
+        } else {
+          setBoxes(initialBoxes);
+        }
+      } catch {
+        if (active) {
+          setBoxes(initialBoxes);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      void window.api.saveLayout(boxes);
+    }, 500);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [boxes]);
+
   const update = (id: string, patch: Partial<DesktopBox>) =>
     setBoxes((prev) =>
       prev.map((b) => (b.id === id ? ({ ...b, ...patch } as DesktopBox) : b)),
@@ -35,12 +70,21 @@ export function Desktop({
     h: 220,
   });
 
-  const addAppBox = (files: File[]) => {
-    const apps: AppItem[] = files.map((f) => {
-      const item: AppItem = { id: uid(), label: f.name.replace(/\.[^.]+$/, "") };
-      if (f.type.startsWith("image/")) item.icon = URL.createObjectURL(f);
-      return item;
-    });
+  const addAppBox = async (files: File[]) => {
+    const apps = await Promise.all(
+      files.map(async (f) => {
+        const path = window.api.getPathForFile(f);
+        const { dataUrl } = await window.api.getFileIcon(path);
+
+        return {
+          id: uid(),
+          label: f.name.replace(/\.[^.]+$/, ""),
+          path,
+          icon: dataUrl,
+        } satisfies AppItem;
+      }),
+    );
+
     setBoxes((prev) => [
       ...prev,
       { id: uid(), kind: "app", title: "Apps", rect: nextRect(), apps },

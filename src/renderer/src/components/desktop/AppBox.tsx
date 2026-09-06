@@ -3,6 +3,7 @@ import { AppWindow } from "lucide-react";
 export type AppItem = {
   id: string;
   label: string;
+  path: string;
   icon?: string;
 };
 
@@ -26,8 +27,14 @@ export function AppBox({ apps, onLaunch }: AppBoxProps) {
       {apps.map((app) => (
         <button
           key={app.id}
-          onDoubleClick={() => onLaunch(app)}
-          onClick={() => onLaunch(app)}
+          onDoubleClick={() => {
+            window.api.launchApp(app.path)
+            onLaunch(app)
+          }}
+          onClick={() => {
+            window.api.launchApp(app.path)
+            onLaunch(app)
+          }}
           className="app-tile"
           title={app.label}
         >

@@ -26,6 +26,8 @@ function createWindow(): void {
     }
   })
 
+  registerIpcHandlers(mainWindow)
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
@@ -47,7 +49,6 @@ app.whenReady().then(() => {
     app.setAppUserModelId('com.desktop-organizer')
   }
 
-  registerIpcHandlers()
   createWindow()
 
   app.on('activate', () => {

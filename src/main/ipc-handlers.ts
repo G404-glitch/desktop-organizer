@@ -1,4 +1,4 @@
-import { ipcMain, shell } from 'electron'
+import { BrowserWindow, ipcMain, shell } from 'electron'
 import Store from 'electron-store'
 import { setWallpaper } from 'wallpaper'
 
@@ -6,6 +6,7 @@ const getFileIcon = require('extract-file-icon') as (
   filePath: string,
   size?: number
 ) => Buffer | string | undefined
+
 import {
   IPC_CHANNELS,
   type GetFileIconResult,
@@ -20,7 +21,7 @@ const store = new Store<Record<string, unknown>>()
 const fallbackIconDataUrl =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
 
-export function registerIpcHandlers(): void {
+export function registerIpcHandlers(win: BrowserWindow): void {
   ipcMain.handle(
     IPC_CHANNELS.LAUNCH_APP,
     async (_event, filePath: string): Promise<LaunchAppResult> => {
@@ -84,5 +85,21 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC_CHANNELS.LOAD_LAYOUT, async (): Promise<LoadLayoutResult> => {
     return { data: store.get('layout') ?? null }
+  })
+
+  ipcMain.handle(IPC_CHANNELS.MINIMIZE_WINDOW, async () => {
+    win.minimize()
+  })
+
+  ipcMain.handle(IPC_CHANNELS.MAXIMIZE_WINDOW, async () => {
+    if (win.isMaximized()) {
+      win.unmaximize()
+    } else {
+      win.maximize()
+    }
+  })
+
+  ipcMain.handle(IPC_CHANNELS.CLOSE_WINDOW, async () => {
+    win.close()
   })
 }
