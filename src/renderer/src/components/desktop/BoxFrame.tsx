@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactNode } from "react";
-import { X, GripVertical } from "lucide-react";
+import { X, GripVertical, Eye, Edit3 } from "lucide-react";
 
 export type BoxRect = { x: number; y: number; w: number; h: number };
 
@@ -14,6 +14,8 @@ type BoxFrameProps = {
   onMove: (pos: { x: number; y: number }) => void;
   onResize: (size: { w: number; h: number }) => void;
   onRemove: () => void;
+  onHide?: () => void;
+  onRename?: (newTitle: string) => void;
   children: ReactNode;
 };
 
@@ -105,15 +107,27 @@ export function BoxFrame({
         }`}
       >
         <GripVertical className="h-3.5 w-3.5 opacity-40" />
-        <span className="truncate uppercase">{title}</span>
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={onRemove}
-          aria-label="Remove box"
-          className="ml-auto rounded-md p-1 text-muted-foreground opacity-0 transition hover:bg-destructive/20 hover:text-destructive group-hover:opacity-100"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
+        <TitleEditor title={title} onRename={onRename} />
+        <div className="ml-auto flex items-center gap-1">
+          {onHide && (
+            <button
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={onHide}
+              aria-label="Hide box"
+              className="rounded-md p-1 text-muted-foreground opacity-0 transition hover:bg-muted/10 group-hover:opacity-100"
+            >
+              <Eye className="h-3.5 w-3.5" />
+            </button>
+          )}
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={onRemove}
+            aria-label="Remove box"
+            className="rounded-md p-1 text-muted-foreground opacity-0 transition hover:bg-destructive/20 hover:text-destructive group-hover:opacity-100"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 px-2.5 pb-2.5">{children}</div>
@@ -131,4 +145,36 @@ export function BoxFrame({
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max);
+}
+
+function TitleEditor({
+  title,
+  onRename,
+}: {
+  title?: string;
+  onRename?: (newTitle: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(title ?? "");
+  return editing ? (
+    <input
+      autoFocus
+      className="bg-transparent border-b border-muted text-[11px] uppercase"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={() => {
+        setEditing(false);
+        if (onRename) onRename(value.trim() || title || "");
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          (e.target as HTMLInputElement).blur();
+        }
+      }}
+    />
+  ) : (
+    <span onDoubleClick={() => setEditing(true)} className="truncate uppercase">
+      {title}
+    </span>
+  );
 }

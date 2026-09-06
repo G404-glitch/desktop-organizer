@@ -4,14 +4,16 @@ import { NoteBox } from "./NoteBox";
 import { BoxFrame, type BoxRect } from "./BoxFrame";
 
 export type DesktopBox =
-  | { id: string; kind: "app"; title: string; rect: BoxRect; apps: AppItem[] }
-  | { id: string; kind: "note"; title: string; rect: BoxRect; text: string };
+  | { id: string; kind: "app"; title: string; rect: BoxRect; apps: AppItem[]; hidden?: boolean }
+  | { id: string; kind: "note"; title: string; rect: BoxRect; text: string; hidden?: boolean };
 
 type BoxGridProps = {
   boxes: DesktopBox[];
   onMove: (id: string, pos: { x: number; y: number }) => void;
   onResize: (id: string, size: { w: number; h: number }) => void;
   onRemove: (id: string) => void;
+  onHide: (id: string) => void;
+  onRename: (id: string, title: string) => void;
   onLaunch: (boxId: string, app: AppItem) => void;
   onNoteChange: (boxId: string, text: string) => void;
 };
@@ -51,29 +53,44 @@ export function BoxGrid({
           : "relative h-full w-full overflow-hidden p-3"
       }
     >
-      {boxes.map((box) => (
-        <BoxFrame
-          key={box.id}
-          rect={box.rect}
-          title={box.title}
-          accent={box.kind === "note" ? "note" : "app"}
-          free={!compact}
-          bounds={size}
-          onMove={(pos) => onMove(box.id, pos)}
-          onResize={(s) => onResize(box.id, s)}
-          onRemove={() => onRemove(box.id)}
-        >
-          {box.kind === "app" ? (
-            <AppBox
-              title={box.title}
-              apps={box.apps}
-              onLaunch={(app) => onLaunch(box.id, app)}
-            />
-          ) : (
-            <NoteBox value={box.text} onChange={(text) => onNoteChange(box.id, text)} />
-          )}
-        </BoxFrame>
-      ))}
+      {boxes.map((box) =>
+        box.hidden ? (
+          <button
+            key={box.id}
+            onClick={() => onHide(box.id)}
+            className="absolute left-0 top-0 z-50 rounded-full bg-muted/40 px-3 py-1 text-xs text-foreground/90"
+            style={
+              !compact ? { left: box.rect.x, top: box.rect.y } : undefined
+            }
+          >
+            {box.title}
+          </button>
+        ) : (
+          <BoxFrame
+            key={box.id}
+            rect={box.rect}
+            title={box.title}
+            accent={box.kind === "note" ? "note" : "app"}
+            free={!compact}
+            bounds={size}
+            onMove={(pos) => onMove(box.id, pos)}
+            onResize={(s) => onResize(box.id, s)}
+            onRemove={() => onRemove(box.id)}
+            onHide={() => onHide(box.id)}
+            onRename={(t) => onRename(box.id, t)}
+          >
+            {box.kind === "app" ? (
+              <AppBox
+                title={box.title}
+                apps={box.apps}
+                onLaunch={(app) => onLaunch(box.id, app)}
+              />
+            ) : (
+              <NoteBox value={box.text} onChange={(text) => onNoteChange(box.id, text)} />
+            )}
+          </BoxFrame>
+        ),
+      )}
 
       {boxes.length === 0 && (
         <div className="flex h-full items-center justify-center text-xs text-muted-foreground">

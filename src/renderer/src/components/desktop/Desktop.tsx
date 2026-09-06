@@ -63,6 +63,10 @@ export function Desktop({
       prev.map((b) => (b.id === id ? ({ ...b, ...patch } as DesktopBox) : b)),
     );
 
+  const hideBox = (id: string) => update(id, { hidden: true });
+  const restoreBox = (id: string) => update(id, { hidden: false });
+  const renameBox = (id: string, title: string) => update(id, { title });
+
   const nextRect = () => ({
     x: 40 + (boxes.length % 4) * 40,
     y: 40 + (boxes.length % 4) * 32,
@@ -139,6 +143,13 @@ export function Desktop({
             if (box) update(id, { rect: { ...box.rect, ...size } });
           }}
           onRemove={(id) => setBoxes((prev) => prev.filter((b) => b.id !== id))}
+          onHide={(id) => {
+            // If currently hidden, restore instead
+            const box = boxes.find((b) => b.id === id);
+            if (box?.hidden) restoreBox(id);
+            else hideBox(id);
+          }}
+          onRename={(id, title) => renameBox(id, title)}
           onLaunch={(_boxId, app) => onLaunchApp?.(app)}
           onNoteChange={(id, text) => update(id, { text } as Partial<DesktopBox>)}
         />

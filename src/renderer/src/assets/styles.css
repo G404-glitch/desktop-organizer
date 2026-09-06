@@ -1,5 +1,4 @@
-@import "tailwindcss" source(none);
-@source "../src";
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -63,8 +62,8 @@
 
 :root {
   --radius: 0.875rem;
-  /* Transparent overlay: the OS desktop shows through. */
-  --background: oklch(0 0 0 / 0);
+  /* Subtle translucent purple background replacing full transparency. */
+  --background: oklch(0.12 0.05 300 / 0.06);
   --foreground: oklch(0.97 0.01 250);
   --card: oklch(0.24 0.03 265 / 0.55);
   --card-foreground: oklch(0.97 0.01 250);
@@ -120,7 +119,10 @@
   html,
   body,
   #root {
-    background: transparent;
+    /* layered subtle purple radial gradients over the translucent base */
+    background: radial-gradient(1200px circle at 10% 20%, oklch(0.22 0.08 300 / 0.14), transparent 25%),
+                radial-gradient(1000px circle at 90% 80%, oklch(0.16 0.06 260 / 0.10), transparent 35%),
+                var(--background);
     color: var(--color-foreground);
     font-family:
       "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
